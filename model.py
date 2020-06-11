@@ -75,10 +75,8 @@ class Generator(nn.Module):
 
         self.generator = nn.Sequential(conv1, down1, down2, res_layer, up1, up2, conv2)
 
-    def forward(self, x):
-        res = self.generator(x)
-        print('Encoder shape:', res.shape)
-        return res
+    def forward(self, x): 
+        return self.generator(x)
 
 
 class ResBlock(nn.Module):
