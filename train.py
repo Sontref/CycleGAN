@@ -76,11 +76,13 @@ lambda_cycle = args.lambda_cycle
 ##############
 # Optimizers #
 ##############
-# TODO: add stuff like decay; maybe take somewhere hyperparameters
-G_optimizer = torch.optim.Adam(itertools.chain(G_AB.parameters(), G_BA.parameters()))
-D_A_optimizer = torch.optim.Adam(D_A.parameters())
-D_B_optimizer = torch.optim.Adam(D_B.parameters())
+G_optimizer = torch.optim.Adam(itertools.chain(G_AB.parameters(), G_BA.parameters()), 2e-4)
+D_A_optimizer = torch.optim.Adam(D_A.parameters(), 2e-4)
+D_B_optimizer = torch.optim.Adam(D_B.parameters(), 2e-4)
 
+lr_scheduler_G = torch.optim.lr_scheduler.LambdaLR(G_optimizer, lr_lambda=lambda epoch: 2 - epoch/100)
+lr_scheduler_D_A = torch.optim.lr_scheduler.LambdaLR(D_A_optimizer, lr_lambda=lambda epoch: 2 - epoch/100)
+lr_scheduler_D_B = torch.optim.lr_scheduler.LambdaLR(D_B_optimizer, lr_lambda=lambda epoch: 2 - epoch/100)
 
 ############################################
 # Generating and saving images             #
@@ -195,6 +197,11 @@ for epoch in range(args.num_epochs):
         # If at sample interval save image
         if batches_done > 0 and batches_done % 100 == 0:
             sample_images(batches_done)
+
+    if epoch >= 100:
+        lr_scheduler_G.step(epoch)
+        lr_scheduler_D_A.step(epoch)
+        lr_scheduler_D_B.step(epoch)
 
     if epoch % 50 == 0:
         torch.save(G_AB.state_dict(), "saved_models/%s/G_AB_%d.pth" % (args.dataset_name, epoch))
