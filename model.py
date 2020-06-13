@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-
+### From original CycleGAN paper: https://arxiv.org/pdf/1703.10593.pdf ###
 # c7s1-k denotes a 7×7 Convolution-InstanceNormReLU layer with k filters and stride 1. 
 # dk denotes a 3 × 3 Convolution-InstanceNorm-ReLU layer with k filters and stride 2.
 
@@ -16,7 +16,7 @@ import torch.optim as optim
 
 # The network with 6 residual blocks consists of:
 # c7s1-64,d128,d256,R256,R256,R256,R256,R256,R256,u128,u64,c7s1-3
-
+###
 
 class Generator(nn.Module):
     def __init__(self, in_channels=3, num_residual=6):
@@ -145,16 +145,3 @@ class Discriminator(nn.Module):
 
     def forward(self, x):
         return self.discriminator(x)
-
-
-class CycleGAN(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-        self.model = nn.Sequential(
-            Generator(),
-            Discriminator()
-        )
-    
-    def forward(self, x):
-        return self.model(x)
