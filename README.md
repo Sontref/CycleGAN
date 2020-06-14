@@ -45,7 +45,7 @@ Also by deadline reasons some util stuff was taken from that repo.
 
 Specifically:
 * *sample_images* function to generate and store generated fake images in pretty neat way;
-* entire logging pipeline from *train.py*; 
+* entire logging pipeline; 
 * *FakeImageBuffer* was also taken from there. However, maybe here credits should go to original CycleGAN repo: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix 
 * nice stuff with *parser* which I've seen many times before. I'm glad that I've finally made it by myself (particularly).
 
