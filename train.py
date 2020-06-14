@@ -23,7 +23,7 @@ else:
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--start_from", type=int, default=-1, help="epoch number to start from; 0 for training from scratch")
+parser.add_argument("--start_from", type=int, default=-1, help="epoch number to start from; -1 for training from scratch")
 parser.add_argument("--num_epochs", type=int, default=200, help="number of epochs")
 parser.add_argument("--dataset_name", type=str, default="horse2zebra", help="name of the dataset")
 parser.add_argument("--batch_size", type=int, default=10, help="number of samples in batch")
@@ -32,7 +32,6 @@ parser.add_argument("--img_width", type=int, default=256, help="image width in p
 parser.add_argument("--channels", type=int, default=3, help="number of image channels")
 parser.add_argument("--num_residual", type=int, default=9, help="number of residual blocks")
 parser.add_argument("--lambda_cycle", type=float, default=10.0, help="cycle loss weight")
-parser.add_argument("--lambda_identity", type=float, default=5.0, help="identity loss weight")
 args = parser.parse_args()
 print(args)
 
@@ -84,10 +83,8 @@ else:
 ##############
 criterion_adv = nn.MSELoss()
 criterion_cycle = nn.L1Loss()
-criterion_identity = nn.L1Loss()
 
 lambda_cycle = args.lambda_cycle
-lambda_identity = args.lambda_identity
 
 ##############
 # Optimizers #
@@ -156,12 +153,8 @@ for epoch in range(args.start_from, args.num_epochs):
         loss_cycle_A = criterion_cycle(real_A, rec_A)
         loss_cycle_B = criterion_cycle(real_B, rec_B)  
         loss_cycle = (loss_cycle_A + loss_cycle_B) / 2
-        # Identity loss
-        loss_id_A = criterion_identity(G_BA(real_A), real_A)
-        loss_id_B = criterion_identity(G_AB(real_B), real_B)
-        loss_identity = (loss_id_A + loss_id_B) / 2
         # Total generator loss
-        loss_gen = loss_adv + lambda_cycle * loss_cycle + lambda_identity * loss_identity
+        loss_gen = loss_adv + lambda_cycle * loss_cycle
         
         loss_gen.backward()
         G_optimizer.step()
@@ -205,10 +198,10 @@ for epoch in range(args.start_from, args.num_epochs):
         time_left = datetime.timedelta(seconds=batches_left * (time.time() - batch_time))
         batch_time = time.time()
 
-        print("\r[Epoch %d/%d] [Iteration %d/%d] [D loss: %f] [G loss: %f, adv: %f, cycle: %f, identity: %f] ETA: %s" 
+        print("\r[Epoch %d/%d] [Iteration %d/%d] [D loss: %f] [G loss: %f, adv: %f, cycle: %f] ETA: %s" 
             % (
                 epoch, args.num_epochs, i, len(train_loader), 
-                loss_D.item(), loss_gen.item(), loss_adv.item(), loss_cycle.item(), loss_identity.item(),
+                loss_D.item(), loss_gen.item(), loss_adv.item(), loss_cycle.item(),
                 time_left
                 )
         )
@@ -222,7 +215,7 @@ for epoch in range(args.start_from, args.num_epochs):
         lr_scheduler_D_A.step(epoch)
         lr_scheduler_D_B.step(epoch)
 
-    if epoch % 50 == 0:
+    if epoch % 30 == 0:
         torch.save(G_AB.state_dict(), "saved_models/%s/G_AB_%d.pth" % (args.dataset_name, epoch))
         torch.save(G_BA.state_dict(), "saved_models/%s/G_BA_%d.pth" % (args.dataset_name, epoch))
         torch.save(D_A.state_dict(), "saved_models/%s/D_A_%d.pth" % (args.dataset_name, epoch))
