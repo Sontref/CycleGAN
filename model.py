@@ -77,7 +77,7 @@ class Generator(nn.Module):
             nn.ReflectionPad2d(in_channels),
             nn.Conv2d(in_channels=64, out_channels=3, kernel_size=7, stride=1),
             nn.InstanceNorm2d(3),
-            nn.ReLU(inplace=True)
+            nn.Tanh()
         )
 
         self.generator = nn.Sequential(conv1, down1, down2, res_layer, up1, up2, conv2)
