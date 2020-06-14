@@ -6,16 +6,16 @@
 I've taken some util and pipeline stuff from another repo (described later).  
 I've seen some of these techniques before, so I thought it is the right place to taste them.
 
-Using should be simple.
+Using should be simple (at least after doing some prerequisites).
 1. You should have train.py in the same dir (for example, *project/*) as model.py and datasets.py.
-2. That *project/* dir should also include another dirs: *datasets/*, *saved_models/*, *generated_images*
-3. In *datasets/* you should place your dataset directory *\*dataset_name\*/*, with structure:
+2. That *project/* dir **must** also include another dirs: *datasets/*, *saved_models/*, *generated_images*
+3. In *datasets/* you should place your dataset directory *\*dataset_name\*/*, which **must** contain:
     * *\*dataset_name\*/testA/*
     * *\*dataset_name\*/testB/*
     * *\*dataset_name\*/trainA/*
     * *\*dataset_name\*/trainB/*
     * In these directories you should store your images.
-5. In *saved_models/* and *generated_images/* you should create directories named again *\*dataset_name\*/*, where stuff from training will be saved.
+5. In *saved_models/* and *generated_images/* you **must** create directories named again *\*dataset_name\*/*, where stuff from training will be saved.
 6. Execute train.py. Arguments:
     * "--start_from", type=int, default=-1, help="epoch number to start from; -1 for training from scratch"
     * "--num_epochs", type=int, default=200, help="number of epochs"
@@ -27,6 +27,8 @@ Using should be simple.
     * "--num_residual", type=int, default=9, help="number of residual blocks"
     * "--lambda_cycle", type=float, default=10.0, help="cycle loss weight"
     * "--lambda_identity", type=float, default=5.0, help="identity loss weight"
+7. Model weights will be stored at *project/saved_models/\*dataset_name\*/*;  
+   Generated images will be stored at *project/generated_images/\*dataset_name\*/*;
 
 ### Progress
 For now I've implemented by myself CycleGAN architecture according to https://arxiv.org/pdf/1703.10593.pdf  
