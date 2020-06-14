@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 
 from torchvision.utils import save_image, make_grid
 
+import model
 from model import Generator, Discriminator
 from datasets import ImageDataset, FakeImageBuffer
 
@@ -30,6 +31,7 @@ parser.add_argument("--img_width", type=int, default=256, help="image width in p
 parser.add_argument("--channels", type=int, default=3, help="number of image channels")
 parser.add_argument("--num_residual", type=int, default=9, help="number of residual blocks")
 parser.add_argument("--lambda_cycle", type=float, default=10.0, help="cycle loss weight")
+parser.add_argument("--lambda_identity", type=float, default=5.0, help="identity loss weight")
 args = parser.parse_args()
 print(args)
 
@@ -65,13 +67,22 @@ D_A = Discriminator().to(device=device)
 D_B = Discriminator().to(device=device)
 
 
+G_AB.apply(model.init_weights_func)
+G_BA.apply(model.init_weights_func)
+D_A.apply(model.init_weights_func)
+D_B.apply(model.init_weights_func)
+
+
+
 ##############
 # Criterions #
 ##############
 criterion_adv = nn.MSELoss()
 criterion_cycle = nn.L1Loss()
-lambda_cycle = args.lambda_cycle
+criterion_identity = nn.L1Loss()
 
+lambda_cycle = args.lambda_cycle
+lambda_identity = args.lambda_identity
 
 ##############
 # Optimizers #
@@ -140,8 +151,12 @@ for epoch in range(args.num_epochs):
         loss_cycle_A = criterion_cycle(real_A, rec_A)
         loss_cycle_B = criterion_cycle(real_B, rec_B)  
         loss_cycle = (loss_cycle_A + loss_cycle_B) / 2
+        # Identity loss
+        loss_id_A = criterion_identity(G_BA(real_A), real_A)
+        loss_id_B = criterion_identity(G_AB(real_B), real_B)
+        loss_identity = (loss_id_A + loss_id_B) / 2
         # Total generator loss
-        loss_gen = loss_adv + lambda_cycle * loss_cycle
+        loss_gen = loss_adv + lambda_cycle * loss_cycle + lambda_identity * loss_identity
         
         loss_gen.backward()
         G_optimizer.step()
@@ -180,16 +195,15 @@ for epoch in range(args.num_epochs):
         ###########
         # Logging #
         ########### 
-
         batches_done = epoch * len(train_loader) + i
         batches_left = args.num_epochs * len(train_loader) - batches_done
         time_left = datetime.timedelta(seconds=batches_left * (time.time() - batch_time))
         batch_time = time.time()
 
-        print("\r[Epoch %d/%d] [Iteration %d/%d] [D loss: %f] [G loss: %f, adv: %f, cycle: %f] Time remaining: %s" 
+        print("\r[Epoch %d/%d] [Iteration %d/%d] [D loss: %f] [G loss: %f, adv: %f, cycle: %f, identity: %f] ETA: %s" 
             % (
                 epoch, args.num_epochs, i, len(train_loader), 
-                loss_D.item(), loss_gen.item(), loss_adv.item(), loss_cycle.item(),
+                loss_D.item(), loss_gen.item(), loss_adv.item(), loss_cycle.item(), loss_identity.item(),
                 time_left
                 )
         )

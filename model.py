@@ -5,6 +5,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+def init_weights_func(model):
+    classname = model.__class__.__name__
+    if classname.find("Conv") != -1:
+        torch.nn.init.normal_(model.weight.data, 0.0, 0.02)
+        if hasattr(model, "bias") and model.bias is not None:
+            torch.nn.init.constant_(model.bias.data, 0.0)
+
 ### From original CycleGAN paper: https://arxiv.org/pdf/1703.10593.pdf ###
 # c7s1-k denotes a 7×7 Convolution-InstanceNormReLU layer with k filters and stride 1. 
 # dk denotes a 3 × 3 Convolution-InstanceNorm-ReLU layer with k filters and stride 2.
