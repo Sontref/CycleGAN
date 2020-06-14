@@ -23,6 +23,7 @@ else:
 
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--start_from", type=int, default=-1, help="epoch number to start from; 0 for training from scratch")
 parser.add_argument("--num_epochs", type=int, default=200, help="number of epochs")
 parser.add_argument("--dataset_name", type=str, default="horse2zebra", help="name of the dataset")
 parser.add_argument("--batch_size", type=int, default=10, help="number of samples in batch")
@@ -50,7 +51,7 @@ train_loader = DataLoader(
 
 test_loader = DataLoader(
     ImageDataset(path_to_data='datasets/%s' % args.dataset_name, size=(args.img_height,args.img_width), mode='test'),
-    batch_size=args.batch_size,
+    batch_size=5,
     num_workers=2,
     shuffle=True
 )
@@ -66,12 +67,16 @@ G_BA = Generator(in_channels=args.channels, num_residual=args.num_residual).to(d
 D_A = Discriminator().to(device=device)
 D_B = Discriminator().to(device=device)
 
-
-G_AB.apply(model.init_weights_func)
-G_BA.apply(model.init_weights_func)
-D_A.apply(model.init_weights_func)
-D_B.apply(model.init_weights_func)
-
+if args.start_from == -1:
+    G_AB.apply(model.init_weights_func)
+    G_BA.apply(model.init_weights_func)
+    D_A.apply(model.init_weights_func)
+    D_B.apply(model.init_weights_func)
+else:
+    G_AB.load_state_dict(torch.load("saved_models/%s/G_AB_%d.pth" % (args.dataset_name, args.start_from)))
+    G_BA.load_state_dict(torch.load("saved_models/%s/G_BA_%d.pth" % (args.dataset_name, args.start_from)))
+    D_A.load_state_dict(torch.load("saved_models/%s/D_A_%d.pth" % (args.dataset_name, args.start_from)))
+    D_B.load_state_dict(torch.load("saved_models/%s/D_B_%d.pth" % (args.dataset_name, args.start_from)))
 
 
 ##############
@@ -122,7 +127,7 @@ def sample_images(batches_done):
 # Training #
 ############
 batch_time = time.time()
-for epoch in range(args.num_epochs):
+for epoch in range(args.start_from, args.num_epochs):
     for i, batch in enumerate(train_loader):
 
         real_A = batch['A'].permute(0, 3, 1, 2).to(device=device).float()
