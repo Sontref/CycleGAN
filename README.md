@@ -7,7 +7,7 @@ I've taken some util and pipeline stuff from another repo (described later).
 I've seen some of these techniques before, so I thought it is the right place to taste them.
 
 Using should be simple (at least after doing some prerequisites).
-1. You should have train.py in the same dir (for example, *project/*) as model.py and datasets.py.
+1. You **must** have train.py in the same dir (for example, *project/*) as model.py and datasets.py.
 2. That *project/* dir **must** also include another dirs: *datasets/*, *saved_models/*, *generated_images*
 3. In *datasets/* you should place your dataset directory *\*dataset_name\*/*, which **must** contain:
     * *\*dataset_name\*/testA/*
@@ -26,9 +26,10 @@ Using should be simple (at least after doing some prerequisites).
     * "--channels", type=int, default=3, help="number of image channels"
     * "--num_residual", type=int, default=9, help="number of residual blocks"
     * "--lambda_cycle", type=float, default=10.0, help="cycle loss weight"
-    * "--lambda_identity", type=float, default=5.0, help="identity loss weight"
 7. Model weights will be stored at *project/saved_models/\*dataset_name\*/*;  
    Generated images will be stored at *project/generated_images/\*dataset_name\*/*;
+
+**My dataset can be found here: https://cutt.ly/wul8Xi5**
 
 ### Progress
 For now I've implemented by myself CycleGAN architecture according to https://arxiv.org/pdf/1703.10593.pdf  
@@ -60,7 +61,7 @@ Models still learn some stuff, but it's not enough even for horse2zebra transmut
 AFAIK, my model should be identical to stuff, which were proposed in mentioned paper. Because they described their architecture quite clear=)  
 But it's still not so powerful.
 Anyway, I have one last chance (by time reasons) to reproduce horse2zebra once more.  
-I've added identity loss, which was used in paper, but for another tasks (my images were tinted on generating too; I suppose it can help here too);  
+I've added identity loss (*removed already*), which was used in paper, but for another tasks (my images were tinted on generating too; I suppose it can help here too);  
 I've added schedulers, because I forgot about decaying for the first time, lol.  
 And my **hope**: I forgot about weight initialization as well. Now I've fixed it.  
 
@@ -69,4 +70,22 @@ AFAIK (thanks, Google) it's common practice to not include it (however, original
 Results are visibly better now. I don't have time for horse2zebra, so I'm training my... "Water to Wine" model:D
 I hope, one shouldn't be The Divine One to have the ability to transform water into wine.
 
-*to be continued*
+*Upd.2:* it really works! Not so good, because my dataset is too small, I guess. Also it is clear, that I should have added transformations, but I'll fix this later.  
+
+Here are some results:  
+![Entire](https://i.ibb.co/S7qybCN/entire.png)  
+As you can see, it also transforms glass into wineglass. ~~So maybe it's more powerful than God himself.~~ Maybe it's the task where identity loss will work nice.
+Also all problems caused by lack of transforms are seen here.  
+
+![water2wine](https://i.ibb.co/K6vrXB4/water2wine.png)  ![wine2water](https://i.ibb.co/TtGH6Nm/wine2water.png)   
+And here I think the most interesting result: it seems that model can distinguish water from glass and transform them separately: water and wine flows correctly transformed here.
+
+### Problems
+There are 2 huge problems:
+1. Model wasn't supposed to transform glass into wineglass:D However, it was expected.
+2. Model completely destroys image backgrounds.
+
+I think both of these problems are caused by dataset. First, it is quite small for such a task. Second, it contains only images of water in glass and wine in glass. And this images pretty similar to each other. Even background: water often depicted with light background and wine often depicted with dark one.  
+I think that here could help adding identity loss.
+
+Not a huge problem, but I can't understand, why deleting InstanceNorm layer from output instantly forced model to work. Please, explain it for me if you read this:D
