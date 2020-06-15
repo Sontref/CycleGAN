@@ -29,7 +29,7 @@ Using should be simple (at least after doing some prerequisites).
 7. Model weights will be stored at *project/saved_models/\*dataset_name\*/*;  
    Generated images will be stored at *project/generated_images/\*dataset_name\*/*;
 
-**My dataset can be found here: https://drive.google.com/file/d/1ic8IGYC45pzRylqec550oV7ISTNDxXeJ/view?usp=sharing**
+**My dataset can be found here: https://cutt.ly/wul8Xi5**
 
 ### Progress
 For now I've implemented by myself CycleGAN architecture according to https://arxiv.org/pdf/1703.10593.pdf  
