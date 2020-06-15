@@ -23,7 +23,7 @@ else:
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--start_from", type=int, default=-1, help="epoch number to start from; -1 for training from scratch")
+parser.add_argument("--start_from", type=int, default=0, help="epoch number to start from; 0 for training from scratch")
 parser.add_argument("--num_epochs", type=int, default=200, help="number of epochs")
 parser.add_argument("--dataset_name", type=str, default="horse2zebra", help="name of the dataset")
 parser.add_argument("--batch_size", type=int, default=10, help="number of samples in batch")
@@ -66,7 +66,7 @@ G_BA = Generator(in_channels=args.channels, num_residual=args.num_residual).to(d
 D_A = Discriminator().to(device=device)
 D_B = Discriminator().to(device=device)
 
-if args.start_from == -1:
+if args.start_from == 0:
     G_AB.apply(model.init_weights_func)
     G_BA.apply(model.init_weights_func)
     D_A.apply(model.init_weights_func)
@@ -220,3 +220,9 @@ for epoch in range(args.start_from, args.num_epochs):
         torch.save(G_BA.state_dict(), "saved_models/%s/G_BA_%d.pth" % (args.dataset_name, epoch))
         torch.save(D_A.state_dict(), "saved_models/%s/D_A_%d.pth" % (args.dataset_name, epoch))
         torch.save(D_B.state_dict(), "saved_models/%s/D_B_%d.pth" % (args.dataset_name, epoch))
+
+if(args.num_epoch % 30 != 0):
+    torch.save(G_AB.state_dict(), "saved_models/%s/G_AB_%d.pth" % (args.dataset_name, args.num_epoch))
+    torch.save(G_BA.state_dict(), "saved_models/%s/G_BA_%d.pth" % (args.dataset_name, args.num_epoch))
+    torch.save(D_A.state_dict(), "saved_models/%s/D_A_%d.pth" % (args.dataset_name, args.num_epoch))
+    torch.save(D_B.state_dict(), "saved_models/%s/D_B_%d.pth" % (args.dataset_name, args.num_epoch))
