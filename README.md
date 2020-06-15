@@ -6,7 +6,9 @@
 I've taken some util and pipeline stuff from another repo (described later).  
 I've seen some of these techniques before, so I thought it is the right place to taste them.
 
-Using should be simple (at least after doing some prerequisites).
+*Easy way:* download playground.ipynb and follow instructions.
+
+*Hard way:*  
 1. You **must** have train.py in the same dir (for example, *project/*) as model.py and datasets.py.
 2. That *project/* dir **must** also include another dirs: *datasets/*, *saved_models/*, *generated_images*
 3. In *datasets/* you should place your dataset directory *\*dataset_name\*/*, which **must** contain:
