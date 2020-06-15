@@ -64,4 +64,9 @@ I've added identity loss, which was used in paper, but for another tasks (my ima
 I've added schedulers, because I forgot about decaying for the first time, lol.  
 And my **hope**: I forgot about weight initialization as well. Now I've fixed it.  
 
+*Upd.:* none of this ideas worked. But! I've rewatched some materials on segmentations and saw, that there is no normalization on output layers for Segnets/Unets.
+AFAIK (thanks, Google) it's common practice to not include it (however, original paper on CycleGAN does), so I've deleted it.
+Results are visibly better now. I don't have time for horse2zebra, so I'm training my... "Water to Wine" model:D
+I hope, one shouldn't be The Divine One to have the ability to transform water into wine.
+
 *to be continued*
