@@ -19,7 +19,7 @@ I've seen some of these techniques before, so I thought it is the right place to
     * In these directories you should store your images.
 5. In *saved_models/* and *generated_images/* you **must** create directories named again *\*dataset_name\*/*, where stuff from training will be saved.
 6. Execute train.py. Arguments:
-    * "--start_from", type=int, default=-1, help="epoch number to start from; -1 for training from scratch"
+    * "--start_from", type=int, default=0, help="epoch number to start from; 0 for training from scratch"
     * "--num_epochs", type=int, default=200, help="number of epochs"
     * "--dataset_name", type=str, default="horse2zebra", help="name of the dataset"
     * "--batch_size", type=int, default=10, help="number of samples in batch"
